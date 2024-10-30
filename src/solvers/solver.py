@@ -15,7 +15,6 @@ class MetadataSolver(TypedDict):
 class Solver(ABC):
     _metadata: MetadataSolver
     _betas: np.ndarray
-    L2: np.floating
 
     def _linfunc(self, x: np.ndarray, betas: np.ndarray) -> np.ndarray:
         X = MatrixUtils.generate_X(x)
