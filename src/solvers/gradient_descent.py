@@ -1,11 +1,8 @@
-from types import FunctionType, LambdaType
 import numpy as np
 
-from typing import Dict, List
+from typing import List
 
-from numpy._core.multiarray import ndarray
 from src.solvers.solver import Solver
-from src.utils.linalg import Linalg
 from src.utils.matrix import MatrixUtils
 
 
@@ -33,13 +30,16 @@ class GradientDescent(Solver):
     """
 
     _eta: float
-    _count_iter: int
+    _max_iter: int
 
-    def __init__(self, max_iter: int = 100, eta: float = 0.01, **kwargs):
+    def __init__(self, max_iter: int = 100, eta: float = 0.01):
+
         self._eta = eta
         self._max_iter = max_iter
 
-    def _compute_gradient_cost(self, y: np.ndarray, x: np.ndarray, betas: np.ndarray) -> np.ndarray:
+    def _compute_gradient_cost(
+        self, y: np.ndarray, x: np.ndarray, betas: np.ndarray
+    ) -> np.ndarray:
         X = MatrixUtils.generate_X(x)
         Y = np.reshape(y, (len(y), 1))
         grad = -2 * X.T @ (Y - self._linfunc(x, betas)) / Y.shape[0]
@@ -58,7 +58,7 @@ class GradientDescent(Solver):
         """
         betas = np.random.rand(x.ndim + 1, 1)
 
-        for i in range(self._max_iter):
+        for _ in range(self._max_iter):
             betas = betas - self._eta * self._compute_gradient_cost(y, x, betas)
 
-        return betas[:,0]
+        return [item[0] for item in betas]

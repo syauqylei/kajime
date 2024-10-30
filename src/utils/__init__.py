@@ -1,12 +1,6 @@
-from typing import List
 import numpy as np
 
 
-class MatrixUtils:
-
-    @staticmethod
-    def generate_x(x: List) -> np.ndarray:
-        count = len(x)
-        X = np.array([[1, x[i]] for i in range(count)])
-
-        return X
+def mse(y: np.ndarray, x: np.ndarray) -> np.floating:
+    e_2 = (y - x) ** 2
+    return np.sum(e_2) / len(e_2)
