@@ -1,38 +1,32 @@
 from abc import ABC
-from typing import Any, Iterable, List, Union
+from typing import List
 
 import numpy as np
 
+from src.solvers.gradient_descent import GradientDescent
 from src.solvers.solver import Solver
-from src.utils import MatrixUtils
-
-Feature = Union[np.ndarray, Iterable]
+from src.utils.matrix import MatrixUtils
 
 
 class Regression(ABC):
     _solver: Solver
-
-    @property
-    def solver(self):
-        return self._solver
+    _coefs: List[float]
+    _mse: np.floating
+    _eta: np.floating
+    _epoch: int
 
 
 class LinearRegression(Regression):
-    BETAS: List[float]
-    XtX: np.ndarray
-    Xty: np.ndarray
 
-    def fit(self, feat: Feature, y: List[Any]):
-        self.__calculate_betas(feat, y)
+    def __init__(self, eta: float = 0.01, epoch: int = 100):
+        self._solver = GradientDescent(eta=eta, max_iter=epoch)
 
-    def predict(self, x) -> float:
-        prediction = 0
-        for b in self.BETAS:
-            prediction += b * x
+    def fit(self, feat: np.ndarray, y: np.ndarray):
+        self._coefs = self._solver.solve(y, feat)
+
+    def predict(self, x: np.ndarray) -> np.ndarray:
+        X = MatrixUtils.generate_X(x)
+        COEFS = np.array([[coef for coef in self._coefs] for _ in range(x.shape[0])])
+        prediction = np.array([np.sum(item) for item in COEFS * X])
+
         return prediction
-
-    def __calculate_betas(self, feat: Feature, y: List[Any]):
-        X = MatrixUtils.generate_x(feat)
-        self.XtX = np.dot(X.T, X)
-        self.Xty = np.dot(X.T, np.array(y))
-        self.BETAS = np.dot(np.linalg.inv(self.XtX), self.Xty)
